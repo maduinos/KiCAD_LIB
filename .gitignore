@@ -1,0 +1,13 @@
+# KiCad generated backups and local state
+*-backups/
+fp-info-cache
+*.kicad_prl
+*.bak
+*.bck
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
