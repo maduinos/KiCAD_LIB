@@ -88,8 +88,19 @@ tools/fetch_upstream_libs.sh --update # 태그 갱신
 
 | 라이브러리 | 출처 | 성격 |
 |---|---|---|
-| kicad-symbols / kicad-footprints / kicad-packages3D | gitlab.com/kicad/libraries (태그 `10.0.5`) | KLC 심사를 거친 KiCad 공식본 |
-| digikey-kicad-library | github.com/Digi-Key | Digi-Key 카탈로그 대조본 |
+| kicad-symbols / kicad-footprints / kicad-packages3D | gitlab.com/kicad/libraries (태그 `10.0.5`) | KiCad 프로젝트 팀이 관리·배포하는 공식본 |
+
+여기서 "공식"은 **KiCad 팀이 만들고 KLC(KiCad Library Convention) 규약과 머지리퀘스트 피어
+리뷰를 거쳐 배포한다**는 뜻이지, 부품 제조사가 보증한다는 뜻이 아니다. 라이선스에도
+`provided without warranty of any kind` 로 명시돼 있다. **핀아웃·랜드패턴은 결국 데이터시트로
+직접 대조해야 한다.**
+
+받지 않는 것:
+
+- `digikey-kicad-library` — 업스트림이 스스로 `should be considered unmaintained` 로 표기했고
+  KiCad 6.0 대응조차 되지 않았다. KiCad 10 작업에는 부적합.
+- SnapEDA / UltraLibrarian / SamacSys — 계정 로그인이 필요해 스크립트로 받을 수 없다.
+  Zynq·PMIC 같은 벤더 전용 부품은 여기서 수동으로 받아 이 리포에 넣는다.
 
 받은 뒤 `Preferences > Configure Paths` 에 `KICAD10_SYMBOL_DIR`, `KICAD10_FOOTPRINT_DIR`,
 `KICAD10_3DMODEL_DIR` 를 각 클론 경로로 지정하면, 각 리포에 들어 있는 `sym-lib-table` /

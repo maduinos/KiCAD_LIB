@@ -42,13 +42,15 @@ clone_plain() {  # $1=URL $2=디렉터리명
 [ "${1:-}" = "--update" ] && DO_UPDATE=1 || DO_UPDATE=0
 export DO_UPDATE
 
-# KiCad 공식 라이브러리 (KLC 심사를 거친 검증본, CC-BY-SA 4.0 + exception)
+# KiCad 프로젝트 팀이 관리·배포하는 공식 라이브러리 (CC-BY-SA 4.0 + exception).
+# "공식"은 KLC 규약 + 피어 리뷰를 거쳤다는 뜻이며, 제조사 보증이 아니다.
+# 라이선스에 without warranty of any kind 로 명시돼 있으니 데이터시트 대조는 별도로 할 것.
 clone_tag kicad-symbols   "$TAG"
 clone_tag kicad-footprints "$TAG"
 clone_tag kicad-packages3D "$TAG"   # 약 3.7GB
 
-# Digi-Key 공식 KiCad 라이브러리 (Digi-Key 카탈로그 대조, CC-BY-SA 4.0)
-clone_plain https://github.com/Digi-Key/digikey-kicad-library.git digikey-kicad-library
+# digikey-kicad-library 는 받지 않는다. 업스트림이 unmaintained 로 표기했고
+# KiCad 6.0 대응조차 되지 않아 KiCad 10 작업에 부적합하다.
 
 echo
 echo "완료. 위치: $DEST"
