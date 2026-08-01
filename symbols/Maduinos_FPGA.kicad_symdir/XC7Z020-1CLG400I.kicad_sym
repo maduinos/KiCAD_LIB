@@ -8,7 +8,7 @@
 	    (property "Value" "XC7Z020-1CLG400I" (id 1) (at 43.18 7.62 0)
 	      (effects (font (size 1.524 1.524)))
 	    )
-	    (property "Footprint" "Maduinos_BGA:CLG400_ZYNQ-7000_AMD" (id 2) (at 0 0 0)
+	    (property "Footprint" "Package_BGA:Xilinx_CLG400" (id 2) (at 0 0 0)
 	      (effects (font (size 1.27 1.27) italic) hide)
 	    )
 	    (property "Datasheet" "XC7Z020-1CLG400I" (id 3) (at 0 0 0)

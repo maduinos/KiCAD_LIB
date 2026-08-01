@@ -8,7 +8,7 @@
 	    (property "Value" "TPS65218D0RSLR" (id 1) (at 0 0 0)
 	      (effects (font (size 1.524 1.524)))
 	    )
-	    (property "Footprint" "Maduinos_SMD:RSL0048B" (id 2) (at 0 0 0)
+	    (property "Footprint" "Package_DFN_QFN:QFN-48-1EP_6x6mm_P0.4mm_EP4.3x4.3mm" (id 2) (at 0 0 0)
 	      (effects (font (size 1.27 1.27) italic) hide)
 	    )
 	    (property "Datasheet" "https://www.ti.com/lit/gpn/tps65218d0" (id 3) (at 0 0 0)

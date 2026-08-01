@@ -8,7 +8,7 @@
 	    (property "Value" "XCZU2CG-1SFVA625E" (id 1) (at -15.24 -34.29 0)
 	      (effects (font (size 1.27 1.27)) (justify top left))
 	    )
-	    (property "Footprint" "Maduinos_BGA:BGA625C80P25X25_2100X2100X343N" (id 2) (at 0 0 0)
+	    (property "Footprint" "Package_BGA:BGA-625_21.0x21.0mm_Layout25x25_P0.8mm" (id 2) (at 0 0 0)
 	      (effects (font (size 1.27 1.27)) (justify bottom) hide)
 	    )
 	    (property "MF" "Xilinx Inc." (id 4) (at 0 0 0)

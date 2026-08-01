@@ -13,10 +13,11 @@ symbols/
   Maduinos_Memory.kicad_symdir/        DDR3, eMMC, QSPI NOR flash (3)
   Maduinos_Power_Analog.kicad_symdir/  PMIC, ADC, LED driver (3)
 footprints/
-  Maduinos_BGA.pretty/                 BGA / FBGA 패키지 (16)
-  Maduinos_SMD.pretty/                 DFN / QFN / TSSOP / HTSSOP 패키지 (12)
+  Maduinos_BGA.pretty/                 공식에 없는 BGA만 (3)
+  Maduinos_SMD.pretty/                 공식에 없는 DFN만 (3)
 3dmodels/
   Maduinos.3dshapes/                   STEP 모델 (10)
+  MODELS.md                            어느 공식 풋프린트에 붙이는지 대응표
 kicad/
   sym-lib-table                        라이브러리 테이블 조각 (아래 설치 참고)
   fp-lib-table
@@ -77,7 +78,8 @@ KiCad 전역 테이블에 **추가**한다. 전역 테이블 위치는 보통 `~
 
 ## 서드파티 공식 라이브러리
 
-이 리포는 **공식 라이브러리에 없는 커스텀 부품만** 담는다. 저항/커패시터/커넥터/일반 패키지 등은
+이 리포는 **공식 라이브러리에 없는 것만** 담는다. 공식과 겹치는 풋프린트는 전부 삭제했고,
+심볼의 Footprint 속성은 `Package_BGA:Xilinx_CLG400` 처럼 공식 라이브러리를 직접 가리킨다. 저항/커패시터/커넥터/일반 패키지 등은
 검증된 업스트림에서 따로 받아 쓴다. 리포 안에 복사해 넣지 않는 이유는 라이선스가 분리돼 있고,
 업스트림이 독립적으로 갱신되며, 3D 모델만 3.7GB라 히스토리가 오염되기 때문이다.
 
@@ -142,3 +144,29 @@ python3 tools/check_library.py
 
 라이선스 미선정. 선정 전까지는 Maduinos 프로젝트 외부에서 쓰기 전에 리포 소유자에게 문의할 것.
 벤더에서 파생된 패키지 데이터는 원 제조사의 이용 약관을 따른다.
+
+## 공식과의 분담
+
+풋프린트를 공식과 형상 대조(패드 수·좌표·피치·EP 치수)한 결과 8개 패키지가 겹쳐서 삭제했다.
+남은 것은 공식에 대응물이 없는 2개뿐이다.
+
+| 남긴 것 | 이유 |
+|---|---|
+| `Maduinos_BGA:FBGA98_K4B4G1646E-BCMA_SAM` | 공식에 삼성 DDR3 FBGA-96 대응물 없음 |
+| `Maduinos_SMD:W-PDFN-8MLP8_W9_MRN` | 공식은 W7(6x5mm)만 있음. 이 부품은 W9(8x6mm)로 다른 패키지 |
+
+삭제한 것들은 심볼이 공식을 직접 가리키도록 바꿨다. 다만 **랜드패턴이 완전히 같지는 않다** —
+볼/핀 좌표는 일치하지만 패드 치수가 다르다. 발주 전 아래를 데이터시트로 확인할 것.
+
+| 패키지 | 삭제한 것(UltraLibrarian) | 공식 | 패드 차이 |
+|---|---|---|---|
+| Zynq CLG400 | 0.447mm | `Xilinx_CLG400` 0.4mm | 지름 −0.047 |
+| Zynq FFG676 | 0.569mm | `Xilinx_FFG676` 0.53mm | 지름 −0.039 |
+| ZU2CG BGA625 | 0.45mm | `BGA-625_21.0x21.0mm...` 0.4mm | 지름 −0.05 |
+| eMMC 153ball | 0.244mm | `LFBGA-153_11.5x13mm...` 0.24mm | 지름 −0.004 |
+| TSSOP-16 | 1.655×0.381 | `TSSOP-16_4.4x5mm_P0.65mm` 1.475×0.4 | 길이 −0.18, 폭 +0.019 |
+| HTSSOP-32 | 1.462×0.355, EP 4.11×4.36 | `HTSSOP-32-1EP_6.1x11mm...` 1.2×0.4, EP 5.2×11 | EP 정의 방식이 다름 |
+| VQFN-48 | EP 4.4×4.4, 좌표 ±2.9 | `QFN-48-1EP_6x6mm_P0.4mm_EP4.3x4.3mm` ±2.95 | EP −0.1, 좌표 +0.05 |
+
+BGA 패드 지름은 솔더조인트 신뢰성과 이스케이프 라우팅에 직접 영향을 준다.
+Zynq는 AMD UG865(Packaging and Pinout)의 권장 랜드패턴과 대조할 것.

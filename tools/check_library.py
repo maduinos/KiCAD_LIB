@@ -8,7 +8,7 @@
 
 실행: python3 tools/check_library.py   (문제 있으면 exit 1)
 """
-import pathlib, re, sys
+import pathlib, re, sys, os
 root = pathlib.Path(__file__).resolve().parent.parent
 
 def balanced(t):
@@ -43,6 +43,8 @@ for d in sorted((root/"symbols").glob("*.kicad_symdir")):
         sym_links.append((names[0],fp))
         print(f"    {names[0]:24s} -> {fp}")
 
+UPSTREAM = pathlib.Path(os.environ.get("KICAD_UPSTREAM_DIR",
+              pathlib.Path.home()/"03_Hardware/kicad-libraries"))/"kicad-footprints"
 print("\n== 풋프린트 라이브러리 ==")
 fpnames={}
 for d in sorted((root/"footprints").glob("*.pretty")):
@@ -56,6 +58,14 @@ for d in sorted((root/"footprints").glob("*.pretty")):
         if internal!=stem: flag.append(f"이름불일치({internal})")
         if flag: ok=False; print(f"  !! {lib}:{stem}  {' '.join(flag)}")
     print(f"{lib}.pretty: {len(fpnames[lib])}개")
+
+upstream_ok = UPSTREAM.is_dir()
+if upstream_ok:
+    for d in sorted(UPSTREAM.glob("*.pretty")):
+        fpnames.setdefault(d.name[:-7], set()).update(f.stem for f in d.glob("*.kicad_mod"))
+    print(f"업스트림 {UPSTREAM}: 라이브러리 {len(list(UPSTREAM.glob('*.pretty')))}개 인식")
+else:
+    print(f"!! 업스트림 없음 ({UPSTREAM}) - 공식 라이브러리 링크는 검사 생략")
 
 print("\n== 심볼->풋프린트 링크 해석 ==")
 for n,fp in sym_links:
@@ -75,7 +85,11 @@ for f in sorted((root/"footprints").glob("*.pretty/*.kicad_mod")):
         used.add(r.rsplit("/",1)[-1])
         if r.rsplit("/",1)[-1] not in models:
             print(f"  !! {f.stem}: 모델파일 없음 {r}"); ok=False
-print(f"모델 파일 {len(models)}개, 참조된 것 {len(used)}개, 미사용 {sorted(models-used)}")
+detached = sorted(models-used)
+print(f"모델 파일 {len(models)}개, 이 리포 풋프린트가 참조 {len(used)}개")
+if detached:
+    print(f"  분리 모델 {len(detached)}개 (공식 풋프린트용, 3dmodels/MODELS.md 참고):")
+    for d in detached: print(f"    {d}")
 if nomodel: print(f"  !! model 블록 없는 풋프린트 {len(nomodel)}개: {nomodel}"); ok=False
 print("\n결과:", "ALL OK" if ok else "문제 있음")
 sys.exit(0 if ok else 1)

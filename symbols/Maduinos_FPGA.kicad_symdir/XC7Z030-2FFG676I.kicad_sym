@@ -8,7 +8,7 @@
 	    (property "Value" "XC7Z030-2FFG676I" (id 1) (at 45.72 7.62 0)
 	      (effects (font (size 1.524 1.524)))
 	    )
-	    (property "Footprint" "Maduinos_BGA:FFG676_FFV676_AMD" (id 2) (at 0 0 0)
+	    (property "Footprint" "Package_BGA:Xilinx_FFG676" (id 2) (at 0 0 0)
 	      (effects (font (size 1.27 1.27) italic) hide)
 	    )
 	    (property "Datasheet" "XC7Z030-2FFG676I" (id 3) (at 0 0 0)

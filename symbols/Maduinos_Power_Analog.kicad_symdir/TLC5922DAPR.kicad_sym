@@ -8,7 +8,7 @@
 	    (property "Value" "TLC5922DAPR" (id 1) (at 20.32 7.62 0)
 	      (effects (font (size 1.524 1.524)))
 	    )
-	    (property "Footprint" "Maduinos_SMD:DAP32_4P36X4P11" (id 2) (at 0 0 0)
+	    (property "Footprint" "Package_SO:HTSSOP-32-1EP_6.1x11mm_P0.65mm_EP5.2x11mm_Mask4.11x4.36mm" (id 2) (at 0 0 0)
 	      (effects (font (size 1.27 1.27) italic) hide)
 	    )
 	    (property "Datasheet" "https://www.ti.com/lit/gpn/tlc5922" (id 3) (at 0 0 0)

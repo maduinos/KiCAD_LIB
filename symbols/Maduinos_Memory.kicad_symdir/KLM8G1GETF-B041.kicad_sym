@@ -8,7 +8,7 @@
 	    (property "Value" "KLM8G1GETF-B041" (id 1) (at 25.4 10.16 0)
 	      (effects (font (size 1.524 1.524)))
 	    )
-	    (property "Footprint" "Maduinos_BGA:KLMBG2JENB-B041_SAM" (id 2) (at 0 0 0)
+	    (property "Footprint" "Package_BGA:LFBGA-153_11.5x13mm_Layout14x14_P0.5mm" (id 2) (at 0 0 0)
 	      (effects (font (size 1.27 1.27) italic) hide)
 	    )
 	    (property "Datasheet" "KLM8G1GETF-B041" (id 3) (at 0 0 0)
