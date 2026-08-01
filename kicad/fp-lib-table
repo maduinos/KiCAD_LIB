@@ -1,0 +1,5 @@
+(fp_lib_table
+  (version 7)
+  (lib (name "Maduinos_BGA")(type "KiCad")(uri "${MADUINOS_KICAD_LIB}/footprints/Maduinos_BGA.pretty")(options "")(descr "BGA and FBGA packages"))
+  (lib (name "Maduinos_SMD")(type "KiCad")(uri "${MADUINOS_KICAD_LIB}/footprints/Maduinos_SMD.pretty")(options "")(descr "DFN, QFN, TSSOP and HTSSOP packages"))
+)
