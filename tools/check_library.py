@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """라이브러리 무결성 검사.
 
-  - 심볼/풋프린트 s-expression 괄호 균형
+  - 심볼/풋프린트 s-expression 괄호 균형 (KiCad 10 .kicad_symdir 구조)
   - 풋프린트 파일명 == 내부 footprint 이름
   - 심볼의 Footprint 속성이 "라이브러리:이름" 형식이고 실제로 존재하는지
   - 모든 풋프린트가 (model ...) 를 갖고, 그 STEP 파일이 실재하며, 미사용 모델이 없는지
@@ -28,13 +28,20 @@ def balanced(t):
 
 ok=True
 print("== 심볼 라이브러리 ==")
-for f in sorted((root/"symbols").glob("*.kicad_sym")):
-    t=f.read_text()
-    names=re.findall(r'\n  \(symbol "([^"]+)"',t)
-    fps=re.findall(r'\(property "Footprint" "([^"]*)"',t)
-    b=balanced(t); ok &= b
-    print(f"{f.name}: 괄호={'OK' if b else 'FAIL'} 심볼={len(names)}")
-    for n,fp in zip(names,fps): print(f"    {n:24s} -> {fp}")
+sym_links=[]
+for d in sorted((root/"symbols").glob("*.kicad_symdir")):
+    files=sorted(d.glob("*.kicad_sym"))
+    print(f"{d.name}: 심볼 {len(files)}개")
+    for f in files:
+        t=f.read_text(); b=balanced(t); ok &= b
+        names=re.findall(r'\(symbol "([^"]+)"',t)[:1]
+        fps=re.findall(r'\(property "Footprint" "([^"]*)"',t)[:1]
+        if not names: print(f"    !! {f.name}: symbol 없음"); ok=False; continue
+        if names[0]!=f.stem: print(f"    !! {f.name}: 내부명 {names[0]} != 파일명"); ok=False
+        if not b: print(f"    !! {f.name}: 괄호 FAIL")
+        fp=fps[0] if fps else ""
+        sym_links.append((names[0],fp))
+        print(f"    {names[0]:24s} -> {fp}")
 
 print("\n== 풋프린트 라이브러리 ==")
 fpnames={}
@@ -51,14 +58,12 @@ for d in sorted((root/"footprints").glob("*.pretty")):
     print(f"{lib}.pretty: {len(fpnames[lib])}개")
 
 print("\n== 심볼->풋프린트 링크 해석 ==")
-for f in sorted((root/"symbols").glob("*.kicad_sym")):
-    for n,fp in zip(re.findall(r'\n  \(symbol "([^"]+)"',f.read_text()),
-                    re.findall(r'\(property "Footprint" "([^"]*)"',f.read_text())):
-        if ":" not in fp: print(f"  !! {n}: 접두어 없음 '{fp}'"); ok=False; continue
-        lib,name=fp.split(":",1)
-        if lib not in fpnames: print(f"  !! {n}: 라이브러리 '{lib}' 없음"); ok=False
-        elif name not in fpnames[lib]: print(f"  !! {n}: 풋프린트 '{name}' 없음"); ok=False
-        else: print(f"  OK {n:24s} -> {fp}")
+for n,fp in sym_links:
+    if ":" not in fp: print(f"  !! {n}: 접두어 없음 '{fp}'"); ok=False; continue
+    lib,name=fp.split(":",1)
+    if lib not in fpnames: print(f"  !! {n}: 라이브러리 '{lib}' 없음"); ok=False
+    elif name not in fpnames[lib]: print(f"  !! {n}: 풋프린트 '{name}' 없음"); ok=False
+    else: print(f"  OK {n:24s} -> {fp}")
 
 print("\n== 3D 모델 참조 ==")
 models={p.name for p in (root/"3dmodels/Maduinos.3dshapes").glob("*")}

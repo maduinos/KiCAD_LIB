@@ -5,28 +5,33 @@ Maduinos 하드웨어 작업용 개인 KiCad 라이브러리. 심볼 / 풋프린
 
 ## 구조
 
+대상 **KiCad 10** (라이브러리 포맷 `.kicad_symdir`). 업스트림 공식 라이브러리는 `10.0.5` 태그에 맞춰 둔다.
+
 ```text
 symbols/
-  Maduinos_FPGA.kicad_sym          AMD/Xilinx Zynq-7000, Zynq UltraScale+
-  Maduinos_Memory.kicad_sym        DDR3, eMMC, QSPI NOR flash
-  Maduinos_Power_Analog.kicad_sym  PMIC, ADC, LED driver
+  Maduinos_FPGA.kicad_symdir/          AMD/Xilinx Zynq-7000, Zynq UltraScale+ (4)
+  Maduinos_Memory.kicad_symdir/        DDR3, eMMC, QSPI NOR flash (3)
+  Maduinos_Power_Analog.kicad_symdir/  PMIC, ADC, LED driver (3)
 footprints/
-  Maduinos_BGA.pretty/             BGA / FBGA 패키지 (16)
-  Maduinos_SMD.pretty/             DFN / QFN / TSSOP / HTSSOP 패키지 (12)
+  Maduinos_BGA.pretty/                 BGA / FBGA 패키지 (16)
+  Maduinos_SMD.pretty/                 DFN / QFN / TSSOP / HTSSOP 패키지 (12)
 3dmodels/
-  Maduinos.3dshapes/               STEP 모델 (10)
+  Maduinos.3dshapes/                   STEP 모델 (10)
 kicad/
-  sym-lib-table                    라이브러리 테이블 조각 (아래 설치 참고)
+  sym-lib-table                        라이브러리 테이블 조각 (아래 설치 참고)
   fp-lib-table
 tools/
-  check_library.py                 무결성 검사 스크립트
+  check_library.py                     무결성 검사 스크립트
+  fetch_upstream_libs.sh               서드파티 공식 라이브러리 수집
 ```
 
 ### 네이밍 규칙
 
-- **`.kicad_sym` 파일 하나 = KiCad 라이브러리 하나.** 부품 하나당 파일 하나로 쪼개지 말 것.
-  새 부품은 카테고리에 맞는 기존 파일에 추가한다. 새 카테고리가 필요할 때만 파일을 늘리고,
-  그때 `kicad/sym-lib-table`에도 한 줄 추가한다.
+- **`.kicad_symdir` 디렉터리 하나 = KiCad 라이브러리 하나, 그 안의 `.kicad_sym` 파일 하나 = 심볼 하나.**
+  이것이 KiCad 10 네이티브 포맷이다 (KiCad 9까지 쓰던 단일 `.kicad_sym` 통합 파일 방식과 다름).
+  심볼 파일명은 반드시 내부 `(symbol "...")` 이름과 같아야 한다.
+  새 부품은 카테고리에 맞는 기존 `.kicad_symdir`에 파일로 추가한다. 새 카테고리를 만들 때만
+  디렉터리를 늘리고, 그때 `kicad/sym-lib-table`에도 한 줄 추가한다.
 - **`.pretty` 폴더 이름이 곧 라이브러리 닉네임**이 된다. 심볼의 Footprint 속성은 항상
   `Maduinos_BGA:CLG400_AMD` 처럼 `라이브러리:풋프린트` 형식이어야 한다. 접두어가 없으면
   스키매틱→PCB 업데이트에서 풋프린트가 할당되지 않는다.
@@ -69,6 +74,40 @@ KiCad 전역 테이블에 **추가**한다. 전역 테이블 위치는 보통 `~
 
 **3) 3D 모델** — 풋프린트 안에 `${MADUINOS_KICAD_LIB}/3dmodels/...` 로 이미 박혀 있으므로,
 1번만 되어 있으면 추가 설정이 필요 없다.
+
+## 서드파티 공식 라이브러리
+
+이 리포는 **공식 라이브러리에 없는 커스텀 부품만** 담는다. 저항/커패시터/커넥터/일반 패키지 등은
+검증된 업스트림에서 따로 받아 쓴다. 리포 안에 복사해 넣지 않는 이유는 라이선스가 분리돼 있고,
+업스트림이 독립적으로 갱신되며, 3D 모델만 3.7GB라 히스토리가 오염되기 때문이다.
+
+```bash
+tools/fetch_upstream_libs.sh          # 기본 위치: ~/03_Hardware/kicad-libraries
+tools/fetch_upstream_libs.sh --update # 태그 갱신
+```
+
+| 라이브러리 | 출처 | 성격 |
+|---|---|---|
+| kicad-symbols / kicad-footprints / kicad-packages3D | gitlab.com/kicad/libraries (태그 `10.0.5`) | KLC 심사를 거친 KiCad 공식본 |
+| digikey-kicad-library | github.com/Digi-Key | Digi-Key 카탈로그 대조본 |
+
+받은 뒤 `Preferences > Configure Paths` 에 `KICAD10_SYMBOL_DIR`, `KICAD10_FOOTPRINT_DIR`,
+`KICAD10_3DMODEL_DIR` 를 각 클론 경로로 지정하면, 각 리포에 들어 있는 `sym-lib-table` /
+`fp-lib-table` 이 그대로 동작한다.
+
+> **버전을 반드시 맞출 것.** KiCad 10은 `.kicad_symdir` 포맷을 쓰고, KiCad 7/8/9는 이를 읽지 못한다.
+> 다른 버전의 KiCad를 쓰게 되면 `KICAD_LIB_TAG` 를 바꿔 다시 받아야 한다.
+
+### Zynq-7 SOM 관련 커버리지
+
+| 부품 | 출처 |
+|---|---|
+| Zynq-7000 (XC7Z) 심볼 | **공식 라이브러리에 없음.** 이 리포의 `Maduinos_FPGA` 가 유일 |
+| Zynq BGA 풋프린트 | 공식 `Package_BGA` 에 `Xilinx_CLG400`, `Xilinx_FBG676` 존재 (이 리포 것과 교차 검증 가능) |
+| DDR3 SDRAM | 공식 `Memory_RAM` 에 Micron MT41K256M16 계열. 이 리포엔 삼성 K4B4G1646E |
+| SOM 보드투보드 커넥터 | 공식 `Connector_Hirose_DF40`, `Connector_Hirose_FX8` |
+| Ethernet PHY | 공식 `Interface_Ethernet` (DP83848/DP83825 등) |
+| 수동소자·전원·기구물 | 공식 라이브러리로 충분 |
 
 ## 검사
 

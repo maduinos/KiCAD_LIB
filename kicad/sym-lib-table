@@ -1,6 +1,6 @@
 (sym_lib_table
-  (version 7)
-  (lib (name "Maduinos_FPGA")(type "KiCad")(uri "${MADUINOS_KICAD_LIB}/symbols/Maduinos_FPGA.kicad_sym")(options "")(descr "AMD/Xilinx Zynq-7000 and Zynq UltraScale+ devices"))
-  (lib (name "Maduinos_Memory")(type "KiCad")(uri "${MADUINOS_KICAD_LIB}/symbols/Maduinos_Memory.kicad_sym")(options "")(descr "DDR3, eMMC and QSPI NOR flash devices"))
-  (lib (name "Maduinos_Power_Analog")(type "KiCad")(uri "${MADUINOS_KICAD_LIB}/symbols/Maduinos_Power_Analog.kicad_sym")(options "")(descr "PMIC, ADC and LED driver devices"))
+	(version 7)
+	(lib (name "Maduinos_FPGA") (type "KiCad") (uri "${MADUINOS_KICAD_LIB}/symbols/Maduinos_FPGA.kicad_symdir") (options "") (descr "AMD/Xilinx Zynq-7000 and Zynq UltraScale+ devices"))
+	(lib (name "Maduinos_Memory") (type "KiCad") (uri "${MADUINOS_KICAD_LIB}/symbols/Maduinos_Memory.kicad_symdir") (options "") (descr "DDR3, eMMC and QSPI NOR flash devices"))
+	(lib (name "Maduinos_Power_Analog") (type "KiCad") (uri "${MADUINOS_KICAD_LIB}/symbols/Maduinos_Power_Analog.kicad_symdir") (options "") (descr "PMIC, ADC and LED driver devices"))
 )
