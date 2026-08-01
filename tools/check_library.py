@@ -8,7 +8,7 @@
 
 실행: python3 tools/check_library.py   (문제 있으면 exit 1)
 """
-import pathlib, re, sys, os, subprocess
+import pathlib, re, sys, os, subprocess, atexit
 root = pathlib.Path(__file__).resolve().parent.parent
 
 def balanced(t):
@@ -43,21 +43,50 @@ for d in sorted((root/"symbols").glob("*.kicad_symdir")):
         sym_links.append((names[0],fp))
         print(f"    {names[0]:24s} -> {fp}")
 
+_MOUNT_PROC = None
+
 def _official_footprints():
-    """공식 풋프린트 라이브러리 위치. KiCad(flatpak) 설치본을 우선 사용한다."""
+    """공식 풋프린트 라이브러리 위치.
+
+    KiCad는 AppImage로 쓰므로 공식 라이브러리가 AppImage 안에 들어 있다.
+    평소에는 마운트돼 있지 않으므로, 필요하면 --appimage-mount 로 잠깐 붙였다가 쓴다.
+    우선순위: KICAD_FOOTPRINT_DIR 환경변수 > 이미 붙어 있는 마운트 > AppImage 임시 마운트
+              > 배포판 패키지 경로
+    """
+    global _MOUNT_PROC
     env = os.environ.get("KICAD_FOOTPRINT_DIR")
     if env: return pathlib.Path(env)
-    try:
-        loc = subprocess.run(
-            ["flatpak", "info", "--show-location", "org.kicad.KiCad.Library.Footprints"],
-            capture_output=True, text=True, timeout=30).stdout.strip()
-        if loc: return pathlib.Path(loc)/"files"/"footprints"
-    except Exception:
-        pass
-    for c in ("/usr/share/kicad/footprints",):
-        if pathlib.Path(c).is_dir(): return pathlib.Path(c)
+
+    # 이미 마운트돼 있으면 그대로 사용 (KiCad 실행 중이면 여기 걸린다)
+    for m in sorted(pathlib.Path("/tmp").glob(".mount_kicad*")):
+        p = m/"usr"/"share"/"kicad"/"footprints"
+        if p.is_dir(): return p
+
+    # AppImage를 찾아 임시 마운트
+    cand = sorted(pathlib.Path(os.environ.get("KICAD_APPIMAGE_DIR",
+                  pathlib.Path.home()/"tools")).glob("kicad-*.AppImage"))
+    if cand:
+        try:
+            _MOUNT_PROC = subprocess.Popen([str(cand[-1]), "--appimage-mount"],
+                                           stdout=subprocess.PIPE, text=True)
+            line = _MOUNT_PROC.stdout.readline().strip()
+            if line:
+                p = pathlib.Path(line)/"usr"/"share"/"kicad"/"footprints"
+                if p.is_dir(): return p
+        except Exception:
+            pass
+
+    p = pathlib.Path("/usr/share/kicad/footprints")
+    if p.is_dir(): return p
     return pathlib.Path("/nonexistent")
 
+def _cleanup():
+    if _MOUNT_PROC and _MOUNT_PROC.poll() is None:
+        _MOUNT_PROC.terminate()
+        try: _MOUNT_PROC.wait(timeout=10)
+        except Exception: _MOUNT_PROC.kill()
+
+atexit.register(_cleanup)
 UPSTREAM = _official_footprints()
 print("\n== 풋프린트 라이브러리 ==")
 fpnames={}

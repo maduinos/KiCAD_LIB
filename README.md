@@ -5,7 +5,8 @@ Maduinos 하드웨어 작업용 개인 KiCad 라이브러리. 심볼 / 풋프린
 
 ## 구조
 
-대상 **KiCad 10** (라이브러리 포맷 `.kicad_symdir`). 업스트림 공식 라이브러리는 `10.0.5` 태그에 맞춰 둔다.
+대상 **KiCad 10.0.5 AppImage** (`~/tools/kicad-10.0.5-x86_64.AppImage`).
+라이브러리 포맷은 KiCad 10의 `.kicad_symdir` 이며, 공식 라이브러리는 AppImage에 내장돼 있다.
 
 ```text
 symbols/
@@ -77,21 +78,28 @@ KiCad 전역 테이블에 **추가**한다. 전역 테이블 위치는 보통 `~
 
 ## 공식 라이브러리
 
-공식 심볼·풋프린트·3D는 **KiCad 본체가 flatpak 확장으로 함께 설치한다.** 따로 클론하지 않는다.
+공식 심볼·풋프린트·3D는 **KiCad AppImage 안에 전부 들어 있다.** 따로 받을 것이 없다.
 
-```bash
-flatpak install --user flathub org.kicad.KiCad   # 라이브러리 확장까지 같이 붙는다
-flatpak update                                    # 앱과 라이브러리가 함께 갱신됨
+```
+~/tools/kicad-10.0.5-x86_64.AppImage      # Full 판, 460MB (마운트 시 약 2.5GB)
 ```
 
-| 확장 | 크기 |
+| 내용 | 수량 |
 |---|---|
-| `org.kicad.KiCad.Library.Symbols` | 221M |
-| `org.kicad.KiCad.Library.Footprints` | 181M |
-| `org.kicad.KiCad.Library.Packages3D` | 3.2G |
+| 심볼 라이브러리 | 223개 (`.kicad_symdir`) |
+| 풋프린트 라이브러리 | 155개 |
+| 3D 모델 | 7,245개 (2.1GB) |
 
-KiCad가 `KICAD10_*_DIR` 경로 변수를 알아서 잡으므로 등록할 것이 없다. 버전도 앱과 항상 일치한다.
-(별도로 gitlab에서 클론해 두는 방법도 있지만 4.2GB가 그대로 중복되고 앱 버전과 어긋날 수 있어 쓰지 않는다.)
+AppImage는 파일 하나가 곧 프로그램이다. 설치 과정이 없고, 버전을 바꾸려면 새 파일을 받아
+`~/tools/`에 두면 된다. 여러 버전을 나란히 두고 골라 쓸 수 있어 보드 설계처럼 몇 년 뒤
+같은 버전으로 다시 열어야 하는 작업에 유리하다.
+
+실행:
+
+```bash
+~/tools/kicad-10.0.5-x86_64.AppImage          # GUI
+# 앱 런처의 "KiCad" 항목도 이 파일을 가리킨다
+```
 
 여기서 "공식"은 **KiCad 팀이 KLC(KiCad Library Convention) 규약과 머지리퀘스트 피어 리뷰를
 거쳐 배포한다**는 뜻이지, 부품 제조사가 보증한다는 뜻이 아니다. 라이선스에도
@@ -101,8 +109,9 @@ KiCad가 `KICAD10_*_DIR` 경로 변수를 알아서 잡으므로 등록할 것�
 벤더 전용 부품(Zynq, PMIC 등)은 SnapEDA / UltraLibrarian / SamacSys에서 받아 이 리포에 넣는다.
 계정 로그인이 필요해 스크립트로는 받을 수 없다.
 
-> **주의.** flatpak KiCad는 샌드박스가 `filesystems=home` 이라 홈 밖(`/tmp` 등)의 경로를
-> 읽고 쓰지 못한다. 프로젝트와 라이브러리는 홈 아래에 둘 것.
+> **AppImage 안의 라이브러리는 실행 중에만 보인다.** 평소에는 마운트돼 있지 않으므로
+> 외부 스크립트에서 경로로 접근할 수 없다. `tools/check_library.py` 는 이를 감안해
+> 필요할 때 `--appimage-mount` 로 잠깐 붙였다가 끝나면 떼도록 되어 있다.
 
 ### Zynq-7 SOM 관련 커버리지
 
