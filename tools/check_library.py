@@ -8,7 +8,7 @@
 
 실행: python3 tools/check_library.py   (문제 있으면 exit 1)
 """
-import pathlib, re, sys, os
+import pathlib, re, sys, os, subprocess
 root = pathlib.Path(__file__).resolve().parent.parent
 
 def balanced(t):
@@ -43,8 +43,22 @@ for d in sorted((root/"symbols").glob("*.kicad_symdir")):
         sym_links.append((names[0],fp))
         print(f"    {names[0]:24s} -> {fp}")
 
-UPSTREAM = pathlib.Path(os.environ.get("KICAD_UPSTREAM_DIR",
-              pathlib.Path.home()/"03_Hardware/kicad-libraries"))/"kicad-footprints"
+def _official_footprints():
+    """공식 풋프린트 라이브러리 위치. KiCad(flatpak) 설치본을 우선 사용한다."""
+    env = os.environ.get("KICAD_FOOTPRINT_DIR")
+    if env: return pathlib.Path(env)
+    try:
+        loc = subprocess.run(
+            ["flatpak", "info", "--show-location", "org.kicad.KiCad.Library.Footprints"],
+            capture_output=True, text=True, timeout=30).stdout.strip()
+        if loc: return pathlib.Path(loc)/"files"/"footprints"
+    except Exception:
+        pass
+    for c in ("/usr/share/kicad/footprints",):
+        if pathlib.Path(c).is_dir(): return pathlib.Path(c)
+    return pathlib.Path("/nonexistent")
+
+UPSTREAM = _official_footprints()
 print("\n== 풋프린트 라이브러리 ==")
 fpnames={}
 for d in sorted((root/"footprints").glob("*.pretty")):
@@ -63,9 +77,9 @@ upstream_ok = UPSTREAM.is_dir()
 if upstream_ok:
     for d in sorted(UPSTREAM.glob("*.pretty")):
         fpnames.setdefault(d.name[:-7], set()).update(f.stem for f in d.glob("*.kicad_mod"))
-    print(f"업스트림 {UPSTREAM}: 라이브러리 {len(list(UPSTREAM.glob('*.pretty')))}개 인식")
+    print(f"공식 라이브러리 {len(list(UPSTREAM.glob('*.pretty')))}개 인식\n  ({UPSTREAM})")
 else:
-    print(f"!! 업스트림 없음 ({UPSTREAM}) - 공식 라이브러리 링크는 검사 생략")
+    print(f"!! 공식 라이브러리 못 찾음 - 공식 링크 검사 생략 (KICAD_FOOTPRINT_DIR 로 지정 가능)")
 
 print("\n== 심볼->풋프린트 링크 해석 ==")
 for n,fp in sym_links:

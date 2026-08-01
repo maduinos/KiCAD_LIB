@@ -33,7 +33,7 @@ ${MADUINOS_KICAD_LIB}/3dmodels/Maduinos.3dshapes/<파일명>.step
 
 같은 부품을 여러 보드에서 반복해서 쓸 거라면, 공식 풋프린트를 프로젝트 로컬 라이브러리로
 복사한 뒤 거기에 `(model ...)`을 넣어 두는 편이 낫다. 공식 라이브러리 원본은 수정하지 말 것 —
-`--update` 로 갱신할 때 덮어써진다.
+`flatpak update` 때 덮어써진다.
 
 ## 주의
 

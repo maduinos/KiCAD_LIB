@@ -23,7 +23,6 @@ kicad/
   fp-lib-table
 tools/
   check_library.py                     무결성 검사 스크립트
-  fetch_upstream_libs.sh               서드파티 공식 라이브러리 수집
 ```
 
 ### 네이밍 규칙
@@ -76,40 +75,34 @@ KiCad 전역 테이블에 **추가**한다. 전역 테이블 위치는 보통 `~
 **3) 3D 모델** — 풋프린트 안에 `${MADUINOS_KICAD_LIB}/3dmodels/...` 로 이미 박혀 있으므로,
 1번만 되어 있으면 추가 설정이 필요 없다.
 
-## 서드파티 공식 라이브러리
+## 공식 라이브러리
 
-이 리포는 **공식 라이브러리에 없는 것만** 담는다. 공식과 겹치는 풋프린트는 전부 삭제했고,
-심볼의 Footprint 속성은 `Package_BGA:Xilinx_CLG400` 처럼 공식 라이브러리를 직접 가리킨다. 저항/커패시터/커넥터/일반 패키지 등은
-검증된 업스트림에서 따로 받아 쓴다. 리포 안에 복사해 넣지 않는 이유는 라이선스가 분리돼 있고,
-업스트림이 독립적으로 갱신되며, 3D 모델만 3.7GB라 히스토리가 오염되기 때문이다.
+공식 심볼·풋프린트·3D는 **KiCad 본체가 flatpak 확장으로 함께 설치한다.** 따로 클론하지 않는다.
 
 ```bash
-tools/fetch_upstream_libs.sh          # 기본 위치: ~/03_Hardware/kicad-libraries
-tools/fetch_upstream_libs.sh --update # 태그 갱신
+flatpak install --user flathub org.kicad.KiCad   # 라이브러리 확장까지 같이 붙는다
+flatpak update                                    # 앱과 라이브러리가 함께 갱신됨
 ```
 
-| 라이브러리 | 출처 | 성격 |
-|---|---|---|
-| kicad-symbols / kicad-footprints / kicad-packages3D | gitlab.com/kicad/libraries (태그 `10.0.5`) | KiCad 프로젝트 팀이 관리·배포하는 공식본 |
+| 확장 | 크기 |
+|---|---|
+| `org.kicad.KiCad.Library.Symbols` | 221M |
+| `org.kicad.KiCad.Library.Footprints` | 181M |
+| `org.kicad.KiCad.Library.Packages3D` | 3.2G |
 
-여기서 "공식"은 **KiCad 팀이 만들고 KLC(KiCad Library Convention) 규약과 머지리퀘스트 피어
-리뷰를 거쳐 배포한다**는 뜻이지, 부품 제조사가 보증한다는 뜻이 아니다. 라이선스에도
+KiCad가 `KICAD10_*_DIR` 경로 변수를 알아서 잡으므로 등록할 것이 없다. 버전도 앱과 항상 일치한다.
+(별도로 gitlab에서 클론해 두는 방법도 있지만 4.2GB가 그대로 중복되고 앱 버전과 어긋날 수 있어 쓰지 않는다.)
+
+여기서 "공식"은 **KiCad 팀이 KLC(KiCad Library Convention) 규약과 머지리퀘스트 피어 리뷰를
+거쳐 배포한다**는 뜻이지, 부품 제조사가 보증한다는 뜻이 아니다. 라이선스에도
 `provided without warranty of any kind` 로 명시돼 있다. **핀아웃·랜드패턴은 결국 데이터시트로
 직접 대조해야 한다.**
 
-받지 않는 것:
+벤더 전용 부품(Zynq, PMIC 등)은 SnapEDA / UltraLibrarian / SamacSys에서 받아 이 리포에 넣는다.
+계정 로그인이 필요해 스크립트로는 받을 수 없다.
 
-- `digikey-kicad-library` — 업스트림이 스스로 `should be considered unmaintained` 로 표기했고
-  KiCad 6.0 대응조차 되지 않았다. KiCad 10 작업에는 부적합.
-- SnapEDA / UltraLibrarian / SamacSys — 계정 로그인이 필요해 스크립트로 받을 수 없다.
-  Zynq·PMIC 같은 벤더 전용 부품은 여기서 수동으로 받아 이 리포에 넣는다.
-
-받은 뒤 `Preferences > Configure Paths` 에 `KICAD10_SYMBOL_DIR`, `KICAD10_FOOTPRINT_DIR`,
-`KICAD10_3DMODEL_DIR` 를 각 클론 경로로 지정하면, 각 리포에 들어 있는 `sym-lib-table` /
-`fp-lib-table` 이 그대로 동작한다.
-
-> **버전을 반드시 맞출 것.** KiCad 10은 `.kicad_symdir` 포맷을 쓰고, KiCad 7/8/9는 이를 읽지 못한다.
-> 다른 버전의 KiCad를 쓰게 되면 `KICAD_LIB_TAG` 를 바꿔 다시 받아야 한다.
+> **주의.** flatpak KiCad는 샌드박스가 `filesystems=home` 이라 홈 밖(`/tmp` 등)의 경로를
+> 읽고 쓰지 못한다. 프로젝트와 라이브러리는 홈 아래에 둘 것.
 
 ### Zynq-7 SOM 관련 커버리지
 
