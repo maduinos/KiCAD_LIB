@@ -1,3 +1,7 @@
+> 만든 사람: maduinos<br>
+> 문서 만든 날짜: 2026-08-01<br>
+> https://maduinos.blogspot.com/
+
 # 3D 모델 대응표
 
 KiCad 공식 라이브러리는 **풋프린트에 `(model ...)` 참조는 있지만 STEP 파일이 실제로는 없는**

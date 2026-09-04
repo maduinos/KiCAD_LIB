@@ -1,3 +1,7 @@
+> 만든 사람: maduinos<br>
+> 문서 만든 날짜: 2026-06-04<br>
+> https://maduinos.blogspot.com/
+
 # Maduinos KiCad Library
 
 Maduinos 하드웨어 작업용 개인 KiCad 라이브러리. 심볼 / 풋프린트 / 3D 모델을 한 리포에서 관리한다.
